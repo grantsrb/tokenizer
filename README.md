@@ -8,7 +8,7 @@ A lightweight tokenizer with a fair degree of flexibility.
 # Setup
 Open a terminal session and type the following:
 ```
-    $ git clone https://github.com/grantsrb/tokenizer
-    $ cd tokenizer
-    $ pip3 install --user -e .
+$ git clone https://github.com/grantsrb/tokenizer
+$ cd tokenizer
+$ pip3 install --user -e .
 ```
