@@ -1,4 +1,5 @@
 import string
+import torch
 
 def tokenize(main_string, delimeters={" "},
                           special_tokens={"\\newline",'\n'},
@@ -175,7 +176,9 @@ class Tokenizer():
     This class assists in tokenizing the data and converting between
     indices and tokens.
     """
-    def __init__(self, X=None, Y=None, word2idx=None,
+    def __init__(self, X=None, Y=None, tok_X=[],
+                                       tok_Y=[],
+                                       word2idx=None,
                                        idx2word=None,
                                        split_digits=False,
                                        MASK="<MASK>",
@@ -195,6 +198,14 @@ class Tokenizer():
             if None is argued, the word2idx and idx2word must not be
             None
         Y: list of strings
+            these are another list of strings that will be tokenized
+            and indexed. the words in Y will be be included in the 
+            vocabulary if word2idx and idx2word are None
+        tok_X: list of tokens
+            these are the strings that will be tokenized and indexed.
+            if None is argued, the word2idx and idx2word must not be
+            None
+        tok_Y: list of tokens
             these are another list of strings that will be tokenized
             and indexed. the words in Y will be be included in the 
             vocabulary if word2idx and idx2word are None
@@ -249,19 +260,19 @@ class Tokenizer():
 
         x_max_len = 0
         y_max_len = 0
-        tok_x = []
-        tok_y = []
+        assert len(tok_X) == 0 or X is not None
+        assert len(tok_Y) == 0 or Y is not None
         if X is not None or Y is not None:
             if verbose:
                 print("Tokenizing")
             if X is not None:
-                tok_x,x_max_len,words = self.tokenize(X,words=words,
+                tok_X,x_max_len,words = self.tokenize(X,words=words,
                                                         verbose=verbose)
             if Y is not None:
-                tok_y,y_max_len,words = self.tokenize(Y, words=words,
+                tok_Y,y_max_len,words = self.tokenize(Y, words=words,
                                                         verbose=verbose)
-        self.token_X = tok_x
-        self.token_Y = tok_y
+        self.token_X = tok_X
+        self.token_Y = tok_Y
         if word2idx is None:
             word2idx = {w:i+1 for i,w in enumerate(words)}
             word2idx[self.MASK] = 0
@@ -289,19 +300,19 @@ class Tokenizer():
         self.seq_len_x = x_max_len+prepend+append if seq_len_x is None\
                                                         else seq_len_x
         self.X = torch.LongTensor([])
-        if len(tok_x) > 0 and index:
+        if len(tok_X) > 0 and index:
             if verbose:
                 print("Converting to integer indexes")
-            self.X = self.index_tokens(tok_x, self.seq_len_x,
+            self.X = self.index_tokens(tok_X, self.seq_len_x,
                                               prepend=prepend,
                                               append=append)
         self.seq_len_y = y_max_len+prepend+append if seq_len_y is None\
                                                         else seq_len_y
         self.Y = torch.LongTensor([])
-        if len(tok_y) > 0 and index:
+        if len(tok_Y) > 0 and index:
             if verbose:
                 print("Converting to integer indexes")
-            self.Y = self.index_tokens(tok_y, self.seq_len_y,
+            self.Y = self.index_tokens(tok_Y, self.seq_len_y,
                                               prepend=prepend,
                                               append=append)
         self.inits = [self.INIT for i in range(self.seq_len_y)]
