@@ -3,7 +3,8 @@ import torch
 
 def tokenize(main_string, delimeters={" "},
                           special_tokens={"\\newline",'\n'},
-                          split_digits=False):
+                          split_digits=False,
+                          lowercase=False):
     """
     Returns a list of tokens delimeted by the strings contained in the
     delimeters set. Punctuation and whitespace characters are treated
@@ -21,6 +22,8 @@ def tokenize(main_string, delimeters={" "},
     split_digits: bool
         if true, strings of digits will be split into individual 
         digit tokens 0-9
+    lowercase: bool
+        if true, all tokens are lowercased
     """
     tokens = []
     s = ""
@@ -40,6 +43,8 @@ def tokenize(main_string, delimeters={" "},
                         tokens.append(c)
                 else:
                     tokens.append(s)
+                    if lowercase:
+                        tokens[-1] = tokens[-1].lower()
             s = ""
 
         elif char.isalnum() or char=="_" or char=="<" or char==">":
@@ -51,6 +56,8 @@ def tokenize(main_string, delimeters={" "},
                         tokens.append(c)
                 else:
                     tokens.append(s)
+                    if lowercase:
+                        tokens[-1] = tokens[-1].lower()
             tokens.append(char)
             s = ""
         else:
@@ -60,6 +67,8 @@ def tokenize(main_string, delimeters={" "},
                         tokens.append(c)
                 else:
                     tokens.append(s)
+                    if lowercase:
+                        tokens[-1] = tokens[-1].lower()
                 s = ""
             if char == "\\":
                 s += char
@@ -191,6 +200,7 @@ class Tokenizer():
                                        append=False,
                                        index=True,
                                        strings=None,
+                                       words=set(),
                                        verbose=True):
         """
         X: list of strings
@@ -245,6 +255,8 @@ class Tokenizer():
         strings: list of str
             each string in this argued list is included in the
             conversion dictionaries word2idx and idx2word
+        words: set of str
+            a set of words that should be included in the tokenization
         """
         self.MASK = MASK
         self.START = START
@@ -254,14 +266,14 @@ class Tokenizer():
         self.string_Y = Y
         self.split_digits = split_digits
         if split_digits:
-            words = set([str(i) for i in range(10)])
+            words |= set([str(i) for i in range(10)])
         else:
-            words = set([str(i) for i in range(100)])
+            words |= set([str(i) for i in range(100)])
 
         x_max_len = 0
         y_max_len = 0
-        assert len(tok_X) == 0 or X is not None
-        assert len(tok_Y) == 0 or Y is not None
+        assert len(tok_X) == 0 or X is None
+        assert len(tok_Y) == 0 or Y is None
         if X is not None or Y is not None:
             if verbose:
                 print("Tokenizing")
