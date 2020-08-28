@@ -284,13 +284,18 @@ class Tokenizer():
                 tok_Y,y_max_len,words = self.tokenize(Y, words=words,
                                                         verbose=verbose)
         self.token_X = tok_X
+        self.tok_X = tok_X
         self.token_Y = tok_Y
+        self.tok_Y = tok_Y
         if word2idx is None:
-            word2idx = {w:i+1 for i,w in enumerate(words)}
-            word2idx[self.MASK] = 0
+            word2idx = {self.MASK:0}
         if idx2word is None:
-            idx2word = {i+1:w for i,w in enumerate(words)}
-            idx2word[0] = self.MASK
+            idx2word = {0:self.MASK}
+        for word in words:
+            if word not in word2idx:
+                idx = len(word2idx)
+                word2idx[word] = idx 
+                idx2word[idx] = word
         if strings is not None:
             for s in strings:
                 if s not in word2idx:
