@@ -377,7 +377,11 @@ class Tokenizer():
         toks: list of lists of str (N, variable)
             the tokens to be indexed
         seq_len: int
-            the length of the sequence
+            the length of the sequence. if prepend or append is true,
+            they will not add to this number. prepend and append will
+            simply replace the tokens at the first and last locations
+            in the sequence if there is not enough room for the whole
+            sequence.
         prepend: bool
             if true, self.START is prepended to the start of the tokens
         append: bool
