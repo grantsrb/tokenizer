@@ -379,9 +379,13 @@ class Tokenizer():
         seq_len: int
             the length of the sequence
         prepend: bool
-            if true, self.START is prepended to the start of the tokens
+            if true, self.START is prepended to the start of the tokens.
+            will potentially overwrite last token if seq_len is not
+            long enough to contain all tokens
         append: bool
             if true, self.STOP is appended to the end of the tokens
+            will potentially overwrite last token if seq_len is not
+            long enough to contain all tokens
 
         Returns:
             X: torch long tensor (N,XLen)
